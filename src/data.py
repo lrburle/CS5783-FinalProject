@@ -16,9 +16,14 @@ import soundfile as sf
 
 from scipy import signal, misc
 
-
 class Data:
+	def __init__(self, path, outFile):
+		self.createFileList(path, outFile)
+		self.prepareData()
 
+  
+		# Feed files
+    
 	def createFileList(self, path, outFile):
 		dir_list = os.listdir(path)
 
@@ -65,30 +70,22 @@ class Data:
 
 		None
 
-
 	def get_Train(self):
-		x_train = [1, 2, 3]
-		y_train = [1, 2, 3]
 
 		return x_train, y_train
 
 	def get_Test(self):
-		x_test = [1, 2, 3]
-		y_test = [1, 2, 3]
 
 		return x_test, y_test
 	
-	def noise_add(self, x):
-		return x
+	def testPrepareData():
+		data = Data()
+		data.prepareData()
 
-def testPrepareData():
-	data = Data()
-	data.prepareData()
+	def testAddNoise():
+		data = Data()
 
-def testAddNoise():
-	data = Data()
-
-	file = "test_down.wav"
-	data.addNoise(file)
+		file = "test_down.wav"
+		data.addNoise(file)
 
 
