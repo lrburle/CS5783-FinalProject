@@ -41,40 +41,41 @@ def squeeze(audio, labels):
     audio = tf.squeeze(audio, axis=-1)
     return audio, labels
 
-# DATASET_PATH = "data/mini_speech_commands/down/0a9f9af7_nohash_0.wav"
-DATASET_PATH = "data/mini_speech_commands"
+if __name__ == '__main__':
+    # DATASET_PATH = "data/mini_speech_commands/down/0a9f9af7_nohash_0.wav"
+    DATASET_PATH = "data/mini_speech_commands"
 
-data_dir = pathlib.Path(DATASET_PATH)
+    data_dir = pathlib.Path(DATASET_PATH)
 
-train_ds, val_ds = tf.keras.utils.audio_dataset_from_directory(
-    directory=data_dir,
-    batch_size=64,
-    validation_split=0.2,
-    seed=0,
-    output_sequence_length=16000,
-    subset='both')
+    train_ds, val_ds = tf.keras.utils.audio_dataset_from_directory(
+        directory=data_dir,
+        batch_size=64,
+        validation_split=0.2,
+        seed=0,
+        output_sequence_length=16000,
+        subset='both')
 
-label_names = np.array(train_ds.class_names)
+    label_names = np.array(train_ds.class_names)
 
-train_ds = train_ds.map(squeeze, tf.data.AUTOTUNE)
-sets = 6
-for example_audio, example_labels in train_ds.take(sets):  
-    print(example_audio.shape)
-    print(example_labels.shape)
+    train_ds = train_ds.map(squeeze, tf.data.AUTOTUNE)
+    sets = 6
+    for example_audio, example_labels in train_ds.take(sets):  
+        print(example_audio.shape)
+        print(example_labels.shape)
 
-figure, axes = plt.subplots(2, sets,figsize=(12, 8))
-# sound = 0
-for i in range(sets):
-    label = label_names[example_labels[i]]
-    waveform = example_audio[i]
-    spectrogram = get_spectrogram(waveform)
+    figure, axes = plt.subplots(2, sets,figsize=(12, 8))
+    # sound = 0
+    for i in range(sets):
+        label = label_names[example_labels[i]]
+        waveform = example_audio[i]
+        spectrogram = get_spectrogram(waveform)
 
-    timescale = np.arange(waveform.shape[0])
-    axes[0][i].plot(timescale, waveform.numpy())
-    axes[0][i].set_title('Waveform ' + label)
-    axes[0][i].set_xlim([0, 16000])
+        timescale = np.arange(waveform.shape[0])
+        axes[0][i].plot(timescale, waveform.numpy())
+        axes[0][i].set_title('Waveform ' + label)
+        axes[0][i].set_xlim([0, 16000])
 
-    plot_spectrogram(spectrogram.numpy(), axes[1][i])
-    axes[1][i].set_title('Spectrogram')
-    plt.suptitle(label.title())
-plt.show()
+        plot_spectrogram(spectrogram.numpy(), axes[1][i])
+        axes[1][i].set_title('Spectrogram')
+        plt.suptitle(label.title())
+    plt.show()

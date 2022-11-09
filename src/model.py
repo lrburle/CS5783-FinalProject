@@ -11,7 +11,7 @@ The model class shown below is used to build and utilize the built architecture 
 import numpy as np
 import tensorflow as tf
 import os
-from tesorflow import keras
+from tensorflow import keras
 
 class Model:
 	def __init__(self, x_train, y_train, x_test, y_test, x_valid, y_valid, epochs):
@@ -33,7 +33,7 @@ class Model:
 		opt = keras.optimizers.Adam(learning_rate=0.001)
 
 		out.compile(loss="mse", optimizer=opt, metrics=["accuracy"])
-  
+
 		return out 
 	
 	def train(self, modelIn):
