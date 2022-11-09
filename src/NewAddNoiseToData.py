@@ -19,8 +19,6 @@ def prepareFiles():
     createFileList("A:/OSU/Semester 9/CS 5783/CS5783-FinalProject/src/data/mini_speech_commands/no/", "data/FileListNo.txt")
     createFileList("A:/OSU/Semester 9/CS 5783/CS5783-FinalProject/src/data/mini_speech_commands/right/", "data/FileListRight.txt")
 
-
-
 def main():
     word = "down"
     locationWord = word[0].upper() + word[1:len(word)]
@@ -49,6 +47,7 @@ def main():
 
     plt.show()
 
-main()
+if __name__ == '__main__':
+    main()
 
 # prepareFiles()

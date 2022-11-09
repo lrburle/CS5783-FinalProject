@@ -132,3 +132,4 @@ def testCreateData():
 def testInitilization():
 	# Set installBaseData to True if tensorflow data has not been installed 
 	Data(noisePerSound=10, soundPerNoise=10, word="down", installBaseData=False)
+
