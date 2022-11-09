@@ -24,7 +24,7 @@ class Model:
 	# Defining our model.
 	def model(self):
 		out = tf.keras.Sequential([
-			keras.layers.SimpleRNN(20, return_sequences=True),
+			keras.layers.SimpleRNN(20, return_sequences=True, input_shape=(None, 1)),
 			keras.layers.SimpleRNN(20, return_sequences=True),
 			# keras.layers.Attention(),
 

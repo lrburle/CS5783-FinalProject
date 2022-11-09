@@ -20,8 +20,6 @@ class Data:
 	def __init__(self, path, outFile):
 		self.createFileList(path, outFile)
 		self.prepareData()
-
-  
 		# Feed files
     
 	def createFileList(self, path, outFile):

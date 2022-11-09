@@ -14,8 +14,11 @@ if __name__ == '__main__':
     # Import the data needed
     datarate, x_train = wavfile.read('./test_down_noise.wav')
     datarate, y_train = wavfile.read('test_down.wav')
+
+    x_train = np.matrix(x_train).T
     y_train = x_train
-    
+    # y_train = np.matrix(y_train)
+
     x_test = x_train
     y_test = y_train
 
