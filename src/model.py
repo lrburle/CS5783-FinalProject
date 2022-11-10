@@ -35,7 +35,8 @@ class Model:
 		
 		opt = keras.optimizers.Adam(learning_rate=0.001)
 
-		out.compile(loss="mse", optimizer=opt, metrics=['sparse_categorical_accuracy'])
+		# out.compile(loss="mse", optimizer=opt, metrics=['sparse_categorical_accuracy'])
+		out.compile(loss="mse", optimizer=opt, metrics=['mean_squared_error'])
 		self.model = out
 
 		return out 
