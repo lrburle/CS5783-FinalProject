@@ -23,12 +23,12 @@ if __name__ == '__main__':
     y_test = y_train
 
     # Create, train, test, and evaluate model
-    epochs = 10
+    epochs = 1
     m = Model(x_train, y_train, x_test, y_test, epochs)
     model = m.model()
     history, model = m.train(model)
-    m.save(model)
-    output = m.predict(x_test)
+    m.model_save(model)
+    output = m.predict(model, x_test)
 
     # Output necessary graphs and outputs. 
     g = Graph(history)

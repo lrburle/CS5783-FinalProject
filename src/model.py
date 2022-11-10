@@ -36,7 +36,7 @@ class Model:
 		opt = keras.optimizers.Adam(learning_rate=0.001)
 
 		# out.compile(loss="mse", optimizer=opt, metrics=['sparse_categorical_accuracy'])
-		out.compile(loss="mse", optimizer=opt, metrics=['mean_squared_error'])
+		out.compile(loss="mse", optimizer=opt, metrics=['mean_squared_error', 'accuracy'])
 		self.model = out
 
 		return out 
@@ -50,16 +50,16 @@ class Model:
 			next_incr = int(incr) + 1
 			checkpoint_path = checkpoint_path.replace(incr, str(next_incr))
 
-		cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True, verbose=1)
+		cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True, verbose=1, epochs=5)
   
 		history = modelIn.fit(self.x_train, self.y_train, epochs=self.epochs, callbacks=[cp_callback])
 
 		return history, modelIn
 
 	#Saving progress on the model to come back to previous iterations. 
-	def model_save(self, modelIn, incr):
+	def model_save(self, modelIn):
 		path = './backup/trial.1.bak'
-		while(os.path.exist(path)):
+		while(os.path.exists(path)):
 			incr = path.split(".")[-2]
 			next_incr = int(incr) + 1
 			path = path.replace(incr, str(next_incr))

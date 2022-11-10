@@ -18,7 +18,6 @@ from scipy import signal, misc
 
 
 class Data:
-
 	def __init__(self, noisePerSound, soundsPerWord, word, installBaseData=False):
 		if installBaseData:
 			self.prepareData()
