@@ -1,0 +1,5 @@
+data/
+.ipyn_checkpoints/
+
+*.wav
+*.png

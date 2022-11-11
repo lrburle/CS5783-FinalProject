@@ -22,6 +22,7 @@ class Data:
 
 	# def __init__(self, noisePerSound=0, soundPerWord=0, word="", installBaseData=False):
 	def initilize(self, noisePerSound, soundPerWord=0, word="", installBaseData=False):
+
 		if installBaseData:
 			self.prepareData()
 
@@ -134,7 +135,6 @@ class Data:
 		# 16,000 points for testing
 		# 16,000 points for verification
 		# 48,000 points for training
-<<<<<<< Updated upstream
 		# 10 noise per sound
 		# save matrix as .np array in noise_data (not training data) (np.save)
 		# save as string in relatvie path
@@ -162,12 +162,6 @@ class Data:
 
 		# x_train = [1, 2, 3]
 		# y_train = [1, 2, 3]
-=======
-
-
-		x_train = [1, 2, 3]
-		y_train = [1, 2, 3]
->>>>>>> Stashed changes
 
 		return x_train, y_train
 
@@ -212,7 +206,6 @@ def testInitilization():
 	for i in word:
 		data.createData(noisePerSound=noisePerSound, soundsPerWord=soundPerWord, word=i)
 	
-<<<<<<< Updated upstream
 def testConvertWavToMp3():
 	data = Data()
 
@@ -232,6 +225,5 @@ def testPlotSound():
 	plt.figure("Noise Sound")
 	data.plotSound("A:/OSU/Semester 9/CS 5783/CS5783-FinalProject/src/noise_data/training_data/0a9f9af7_nohash_0_noise_9_.wav")
 	plt.show()
-=======
->>>>>>> Stashed changes
+
 
