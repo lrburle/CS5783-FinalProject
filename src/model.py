@@ -50,7 +50,7 @@ class Model:
 			next_incr = int(incr) + 1
 			checkpoint_path = checkpoint_path.replace(incr, str(next_incr))
 
-		cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True, verbose=1, epochs=5)
+		cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, monitor='mean_squared_error', mode=min, save_weights_only=True)
   
 		history = modelIn.fit(self.x_train, self.y_train, epochs=self.epochs, callbacks=[cp_callback])
 
