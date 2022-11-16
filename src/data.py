@@ -160,6 +160,15 @@ class Data:
 
 		return x_train, y_train
 
+	def generateAndSaveData(self):
+		xfiles = os.listdir('./training_data_subset/training_data/X/')
+		yfiles = os.listdir('./training_data_subset/training_data/Y/')
+
+		xdata, ydata = self.convertToArray('./training_data_subset/training_data', xfiles, yfiles)
+
+		np.savetxt('xdata.csv', xdata, delimiter=',')
+		np.savetxt('ydata.csv', ydata, delimiter=',')
+
 	def convertToArray(self, dir, xfiles, yfiles):
 		xfiles.sort()
 		yfiles.sort()

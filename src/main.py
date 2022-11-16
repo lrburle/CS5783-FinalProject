@@ -12,25 +12,18 @@ import numpy as np
 import os
 from scipy.io import wavfile
 
-def generateAndSaveData():
-    xfiles = os.listdir('./training_data_subset/training_data/X/')
-    yfiles = os.listdir('./training_data_subset/training_data/Y/')
-
-    dat = Data()
-    xdata, ydata = dat.convertToArray('./training_data_subset/training_data', xfiles, yfiles)
-
-    np.savetxt('xdata.csv', xdata, delimiter=',')
-    np.savetxt('ydata.csv', ydata, delimiter=',')
 
 if __name__ == '__main__':
     
     # Uncomment if a new set of data is needed. 
-    # generateAndSaveData()
+    # dat = Data()
+    # dat.generateAndSaveData()
 
     # Import the data needed
     xdata = np.loadtxt('xdata.csv', delimiter=',', dtype=float)
     ydata = np.loadtxt('ydata.csv', delimiter=',', dtype=float)
 
+	# Split the data into training and testing datasets
     x_train = xdata[0:40, :]
     y_train = ydata[0:40, :]
 
@@ -41,8 +34,16 @@ if __name__ == '__main__':
     epochs = 25
     m = Model(x_train, y_train, x_test, y_test, epochs)
     model = m.model()
+    
+    # This loads the latest model iteration
+    model = m.model_load('backup/trial.10.bak')
+    
+    # This loads the latest checkpoint into the model.
+    model = m.checkpoint_load('backup', model)
+
     history, model = m.train(model)
     m.model_save(model)
+
     output = m.predict(model, x_test)
 
     # Output necessary graphs and outputs. 

@@ -65,6 +65,16 @@ class Model:
 			path = path.replace(incr, str(next_incr))
 
 		modelIn.save(path)
+	
+	def model_load(self, path):
+		return tf.keras.models.load_model(path)
+	
+	def checkpoint_load(self, dir, modelIn):
+		return modelIn.load_weights(tf.train.latest_checkpoint(dir))
+	
+	def model_evaluate(self, modelIn):
+		evaluate = modelIn.evaluate(self.x_test, self.y_test)
+		return evaluate 
 
 	def predict(self, model, x_test):
 		#Code for outputting the RNN sequence from the input. Hopefully filtered.
