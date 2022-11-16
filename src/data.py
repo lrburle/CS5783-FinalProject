@@ -157,73 +157,91 @@ class Data:
 				allDataX[indexCount] = fileList[i]
 				allDataY[indexCount] = tempY
 				indexCount += 1
-			
-
-
-		# x_train = [1, 2, 3]
-		# y_train = [1, 2, 3]
 
 		return x_train, y_train
 
-	def get_Test(self):
-		x_test = [1, 2, 3]
-		y_test = [1, 2, 3]
+	def generateAndSaveData(self):
+		xfiles = os.listdir('./training_data_subset/training_data/X/')
+		yfiles = os.listdir('./training_data_subset/training_data/Y/')
 
-		return x_test, y_test
+		xdata, ydata = self.convertToArray('./training_data_subset/training_data', xfiles, yfiles)
+
+		np.savetxt('xdata.csv', xdata, delimiter=',')
+		np.savetxt('ydata.csv', ydata, delimiter=',')
+
+	def convertToArray(self, dir, xfiles, yfiles):
+		xfiles.sort()
+		yfiles.sort()
+		incr = 0
+
+		for idx, file in enumerate(xfiles):
+			x, sr = librosa.load(f'{dir}/X/{file}')
+			if idx == 0:
+				xdata = x
+			else:
+				xdata = np.vstack([xdata, x])	
+
+			if(yfiles[incr].split(".")[0] in file.split("_noise_")[0]):
+				y, sr = librosa.load(f'{dir}/Y/{yfiles[incr]}')
+				if idx == 0:
+					ydata = y
+				else:
+					ydata = np.vstack([ydata, y])
+			else:
+				incr = incr + 1
+				y, sr = librosa.load(f'{dir}/Y/{yfiles[incr]}')
+				ydata = np.vstack([ydata, y])
+
+		return xdata, ydata 
 	
-	def noise_add(self, x):
-		return x
-
 	def plotSound(self, file):
 		signal, sr = librosa.load(file)
 		plt.plot(signal)
 		# plt.show()
+    
+	def testPrepareData():
+		data = Data()
+		data.prepareData()
 
-def testPrepareData():
-	data = Data()
-	data.prepareData()
+	def testAddNoise():
+		data = Data()
 
-def testAddNoise():
-	data = Data()
+		file = "test_down.wav"
+		data.addNoise(file)
 
-	file = "test_down.wav"
-	data.addNoise(file)
+	def testCreateData():
+		data = Data()
 
-def testCreateData():
-	data = Data()
+		data.createData(noisePerSound=10, soundPerWord=10, word="down")
 
-	data.createData(noisePerSound=10, soundPerWord=10, word="down")
+	# Example for creating testing and training data with noise
+	def testInitilization():
+		# Set installBaseData to True if tensorflow data has not been installed 
+		data = Data()
 
-# Example for creating testing and training data with noise
-def testInitilization():
-	# Set installBaseData to True if tensorflow data has not been installed 
-	data = Data()
+		noisePerSound = 10
+		soundPerWord = 1000
+		word = ["down", "go", "left", "no", "right", "stop", "up", "yes"]
 
-	noisePerSound = 10
-	soundPerWord = 1000
-	word = ["down", "go", "left", "no", "right", "stop", "up", "yes"]
+		for i in word:
+			data.createData(noisePerSound=noisePerSound, soundsPerWord=soundPerWord, word=i)
+		
+	def testConvertWavToMp3():
+		data = Data()
 
-	for i in word:
-		data.createData(noisePerSound=noisePerSound, soundsPerWord=soundPerWord, word=i)
-	
-def testConvertWavToMp3():
-	data = Data()
+		# for file in os.listdir("noise_data/training_data"):
+		fileList = os.listdir("noise_data/training_data")
 
-	# for file in os.listdir("noise_data/training_data"):
-	fileList = os.listdir("noise_data/training_data")
+		# for i in range(len(fileList)):
+		for i in range(2):
+			temp = "noise_data/training_data/" + fileList[i]
+			print("temp", temp)
+			data.convertWavToMp3(temp)
 
-	# for i in range(len(fileList)):
-	for i in range(2):
-		temp = "noise_data/training_data/" + fileList[i]
-		print("temp", temp)
-		data.convertWavToMp3(temp)
-
-def testPlotSound():
-	data = Data()
-	plt.figure("Sound")
-	data.plotSound("A:/OSU/Semester 9/CS 5783/CS5783-FinalProject/src/noise_data/training_data/0a9f9af7_nohash_0.wav")
-	plt.figure("Noise Sound")
-	data.plotSound("A:/OSU/Semester 9/CS 5783/CS5783-FinalProject/src/noise_data/training_data/0a9f9af7_nohash_0_noise_9_.wav")
-	plt.show()
-
-
+	def testPlotSound():
+		data = Data()
+		plt.figure("Sound")
+		data.plotSound("A:/OSU/Semester 9/CS 5783/CS5783-FinalProject/src/noise_data/training_data/0a9f9af7_nohash_0.wav")
+		plt.figure("Noise Sound")
+		data.plotSound("A:/OSU/Semester 9/CS 5783/CS5783-FinalProject/src/noise_data/training_data/0a9f9af7_nohash_0_noise_9_.wav")
+		plt.show()
