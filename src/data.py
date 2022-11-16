@@ -198,7 +198,7 @@ class Data:
 		signal, sr = librosa.load(file)
 		plt.plot(signal)
 		# plt.show()
-
+    
 	def testPrepareData():
 		data = Data()
 		data.prepareData()
@@ -245,5 +245,3 @@ class Data:
 		plt.figure("Noise Sound")
 		data.plotSound("A:/OSU/Semester 9/CS 5783/CS5783-FinalProject/src/noise_data/training_data/0a9f9af7_nohash_0_noise_9_.wav")
 		plt.show()
-
-
