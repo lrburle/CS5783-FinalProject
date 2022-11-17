@@ -14,6 +14,7 @@ import pickle
 import shutil
 import random
 import csv
+import sys
 # import pydub
 
 import numpy as np
@@ -22,21 +23,18 @@ import soundfile as sf
 import matplotlib.pyplot as plt
 
 from scipy import signal, misc
+from scipy.io import wavfile
 
 class Data:
 
 	# def __init__(self, noisePerSound=0, soundPerWord=0, word="", installBaseData=False):
-	def initilize(self):
+	def initilize(self, noisePerSound=10, soundPerWord=1000, numberOfWords=8):
 		# if installBaseData:
 		self.prepareData()
-
-		noisePerSound = 10
-		soundPerWord = 1000
 		word = ["down", "go", "left", "no", "right", "stop", "up", "yes"]
-		# word = ["down"]
 
-		for i in word:
-			self.createData(noisePerSound=noisePerSound, soundsPerWord=soundPerWord, word=i)	
+		for i in range(numberOfWords):
+			self.createData(noisePerSound=noisePerSound, soundsPerWord=soundPerWord, word=word[i])	
 
 	def createFileList(self, path, outFile):
 		dir_list = os.listdir(path)
@@ -70,6 +68,7 @@ class Data:
 	def addNoise(self, file, word, fileIdentifier="", writeLocation=None):
 		# provide file location
 		signal, sr  = librosa.load(file)
+		signal = librosa.util.fix_length(signal, int(sr * 1))
 		RMS = (np.mean(signal**2))**.5
 		noise = np.random.normal(0, RMS, signal.shape[0])
 		signal_noise = signal + noise
@@ -140,7 +139,7 @@ class Data:
 	# 	# return sound
 
 
-	def MoveXandYFiles(self):
+	def MoveXandYFiles(self, numOfX):
 		PATH = "noise_data/training_data/"
 		if not os.path.isdir(PATH + "X"):
 			os.mkdir(PATH + "X/")
@@ -155,9 +154,9 @@ class Data:
 				fileList.append(f)
 
 		for i in range(len(fileList)):
-			if i % 11 == 0:
+			if i % (numOfX+1) == 0:
 				try:
-					shutil.move(PATH +fileList[i+11], PATH + "Y")
+					shutil.move(PATH +fileList[i+numOfX+1], PATH + "Y")
 				except:
 					None
 			else:
@@ -175,10 +174,6 @@ class Data:
 		PATH_TRAINING_X = PATH_X + "training"
 		PATH_TESTING_X = PATH_X + "testing"
 		PATH_VERIFICATION_X = PATH_X + "verification"
-
-		# PATH_TRAINING_Y = PATH_Y + "training"
-		# PATH_TESTING_Y = PATH_Y + "testing"
-		# PATH_VERIFICATION_Y = PATH_Y + "verification"
 
 		# Create folders
 		if not os.path.isdir(PATH_TRAINING_X):
@@ -233,8 +228,8 @@ class Data:
 				index = random.randrange(0, len(fileListX)-1)
 				temp = fileListX.pop(index)
 				shutil.move(PATH_X + temp, PATH_VERIFICATION_X)
-			except ValueError:
-				shutil.move(PATH_X + fileListX.pop(0), PATH_VERIFICATION_X)
+			# except ValueError:
+			# 	shutil.move(PATH_X + fileListX.pop(0), PATH_VERIFICATION_X)
 			except Exception as e:
 				print("V i", i, "temp", temp)
 				print(e)
@@ -274,7 +269,12 @@ class Data:
 				yFile = file[0:file.index("noise")-1] + ".wav"
 				writer.writerow([file, yFile])
 
-	def createDataSets(self):
+	def plotSound(self, file):
+		signal, sr = librosa.load(file)
+		plt.plot(signal)
+		plt.show()
+
+	def createDataSets(self, noisesPerSound=10, soundPerNoise=1000, numberOfWords=8):
 		# both 1D
 		# mix words
 		# 16,000 points for testing
@@ -287,27 +287,62 @@ class Data:
 		# Cut it down under 100MB
 		# np.matrix is full of .wav or .mp3 (which ever is smaller)
 
-		self.initilize()
-		self.MoveXandYFiles()
+		self.initilize(noisesPerSound, soundPerNoise, numberOfWords)
+		self.MoveXandYFiles(noisesPerSound)
 		self.createTrainingTestVerificationDataSet()
 		self.createDataListFile()
 
+
+# ************************* Functions to get training, testing, and verification data 
+	def get_Data(self, dataType):
+		PATH_X = "noise_data/training_data/X/"
+		PATH_Y = "noise_data/training_data/Y/"		
+		
+		PATH_DATA_X = PATH_X + dataType + "/"
+
+		fileListX = []
+		for f in os.listdir(PATH_DATA_X):
+			if os.path.isfile(os.path.join(PATH_DATA_X, f)):
+				fileListX.append(f)
+
+		# randomize data
+		randomFileListX = []
+		for i in fileListX:
+			randomFileListX.append(fileListX.pop(random.randrange(0, len(fileListX))))
+		
+		x_data = []
+		y_data = []
+		data_rate_x = []
+		data_rate_Y = []
+
+		for file in randomFileListX:
+			dataRate, waveform = wavfile.read(PATH_DATA_X + file)
+			x_data.append(waveform)
+			data_rate_x.append(dataRate)
+			# print(type(waveform), waveform)
+
+			yFile = file[0:file.index("noise")-1] + ".wav"
+			dataRate, waveform = wavfile.read(PATH_Y + yFile)
+			y_data.append(waveform)
+			data_rate_Y.append(dataRate)
+
+		x_data = np.stack(x_data)
+		# y_data = np.concatenate(y_data)
+
+		return x_data, y_data, data_rate_x, data_rate_Y
+
 	def get_Train(self):
-		None
+		return self.get_Data("training")
 
 	def get_Test(self):
-		x_test = [1, 2, 3]
-		y_test = [1, 2, 3]
+		return self.get_Data("testing")
 
-		return x_test, y_test
+	def get_Verification(self):
+		return self.get_Data("verification")
+
 	
-	def noise_add(self, x):
-		return x
 
-	def plotSound(self, file):
-		signal, sr = librosa.load(file)
-		plt.plot(signal)
-		# plt.show()
+
 
 def testPrepareData():
 	data = Data()
@@ -367,6 +402,10 @@ def testCreateDataSets():
 
 def testCreateTrainingTestVerificationDataSet():
 	data = Data()
-	# data.createDataSets()
-	data.createDataListFile()
+	# data.createDataSets(5, 75, 8)
+	x_train, y_train, x_data_rate, y_data_rate = data.get_Data("testing")
+
+	# print(x_train)
+	np.savetxt("x_train.npy", x_train)
+
 
