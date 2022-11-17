@@ -9,20 +9,15 @@ Transformer based RNN model.
 import pathlib
 import os
 import librosa
-import wave
-import pickle
 import shutil
 import random
 import csv
-import sys
-# import pydub
 
 import numpy as np
 import tensorflow as tf
 import soundfile as sf
 import matplotlib.pyplot as plt
 
-from scipy import signal, misc
 from scipy.io import wavfile
 
 class Data:
@@ -317,7 +312,7 @@ class Data:
 		data_rate_Y = []
 
 		for file in randomFileListX:
-			dataRate, waveform = wavfile.read(PATH_DATA_X + file)
+			waveform, dataRate = librosa.load(PATH_DATA_X + file)
 			x_data.append(waveform)
 			data_rate_x.append(dataRate)
 			# print(type(waveform), waveform)
@@ -340,9 +335,6 @@ class Data:
 
 	def get_Verification(self):
 		return self.get_Data("verification")
-
-	
-
 
 
 def testPrepareData():
@@ -405,6 +397,7 @@ def testCreateTrainingTestVerificationDataSet():
 	data = Data()
 	# data.createDataSets(5, 75, 8)
 	x_train, y_train, x_data_rate, y_data_rate = data.get_Data("testing")
+	x_
 
 	# print(x_train)
 	np.savetxt("x_train.npy", x_train)
