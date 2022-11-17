@@ -14,11 +14,13 @@ import os
 from tensorflow import keras
 
 class Model:
-	def __init__(self, x_train, y_train, x_test, y_test, epochs):
+	def __init__(self, x_train, y_train, x_test, y_test,x_valid, y_valid, epochs):
 		self.x_train = x_train
 		self.y_train = y_train
 		self.x_test = x_test
 		self.y_test = y_test
+		self.x_valid = x_valid
+		self.y_valid = y_valid
 		self.epochs = epochs
 
 	# Defining our model.
@@ -52,7 +54,7 @@ class Model:
 
 		cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, monitor='mean_squared_error', mode=min, save_weights_only=True)
   
-		history = modelIn.fit(self.x_train, self.y_train, epochs=self.epochs, callbacks=[cp_callback])
+		history = modelIn.fit(self.x_train, self.y_train, epochs=self.epochs, callbacks=[cp_callback], validation_data=(self.x_valid, self.y_valid))
 
 		return history, modelIn
 
