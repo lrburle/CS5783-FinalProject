@@ -19,7 +19,6 @@ class Graph:
         plt.plot(self.history.history['mean_squared_error'])
         # plt.legend([f'= {test1[1]:.4}', f'= {test2[1]:.4}', f'Architecture - 10 Layer CNN - Filter Number Hourglass, Test Accuracy = {test3[1]:.4}'], loc='lower right')
         plt.grid()
-        plt.show()
         plt.savefig('lossvsepochs.png')
 
     def mseEpochs(self):
@@ -30,5 +29,4 @@ class Graph:
         plt.plot(self.history.history['mean_squared_error'])
         # plt.legend([f'Architecture - 10 Layer CNN - Filter Number Increasing, Test Accuracy = {test1[1]:.4}', f'Architecture - 10 Layer CNN - Filter Number Decreasing, Test Accuracy = {test2[1]:.4}', f'Architecture - 10 Layer CNN - Filter Number Hourglass, Test Accuracy = {test3[1]:.4}'], loc='lower right')
         plt.grid()
-        plt.show()
         plt.savefig('msevsepochs.png')

@@ -287,6 +287,7 @@ class Data:
 		# Cut it down under 100MB
 		# np.matrix is full of .wav or .mp3 (which ever is smaller)
 
+
 		self.initilize(noisesPerSound, soundPerNoise, numberOfWords)
 		self.MoveXandYFiles(noisesPerSound)
 		self.createTrainingTestVerificationDataSet()
@@ -407,5 +408,4 @@ def testCreateTrainingTestVerificationDataSet():
 
 	# print(x_train)
 	np.savetxt("x_train.npy", x_train)
-
 
