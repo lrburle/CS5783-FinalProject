@@ -318,7 +318,7 @@ class Data:
 			# print(type(waveform), waveform)
 
 			yFile = file[0:file.index("noise")-1] + ".wav"
-			dataRate, waveform = wavfile.read(PATH_Y + yFile)
+			waveform, dataRate = librosa.load(PATH_Y + yFile)
 			y_data.append(waveform)
 			data_rate_Y.append(dataRate)
 
