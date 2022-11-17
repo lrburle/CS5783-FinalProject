@@ -9,7 +9,12 @@ Transformer based RNN model.
 import pathlib
 import os
 import librosa
-import pydub
+import wave
+import pickle
+import shutil
+import random
+import csv
+# import pydub
 
 import numpy as np
 import tensorflow as tf
@@ -21,12 +26,17 @@ from scipy import signal, misc
 class Data:
 
 	# def __init__(self, noisePerSound=0, soundPerWord=0, word="", installBaseData=False):
-	def initilize(self, noisePerSound, soundPerWord=0, word="", installBaseData=False):
+	def initilize(self):
+		# if installBaseData:
+		self.prepareData()
 
-		if installBaseData:
-			self.prepareData()
+		noisePerSound = 10
+		soundPerWord = 1000
+		word = ["down", "go", "left", "no", "right", "stop", "up", "yes"]
+		# word = ["down"]
 
-		self.createData(noisePerSound, soundPerWord, word)
+		for i in word:
+			self.createData(noisePerSound=noisePerSound, soundsPerWord=soundPerWord, word=i)	
 
 	def createFileList(self, path, outFile):
 		dir_list = os.listdir(path)
@@ -57,16 +67,16 @@ class Data:
 		# self.createFileList("data/mini_speech_commands/yes/", "data/FileListYes.txt")
 		None
 
-	def addNoise(self, file, fileIdentifier="", writeLocation=None):
+	def addNoise(self, file, word, fileIdentifier="", writeLocation=None):
 		# provide file location
 		signal, sr  = librosa.load(file)
 		RMS = (np.mean(signal**2))**.5
 		noise = np.random.normal(0, RMS, signal.shape[0])
 		signal_noise = signal + noise
 
-		noiseFile = file.replace(".wav", "") + "_noise_" + fileIdentifier + "_.wav"
+		noiseFile = file.replace(".wav", "") + "_" + word + "_noise_" + fileIdentifier + "_.wav"
 		# print(noiseFile)
-
+		file = file.replace(".wav", "_" + word + ".wav")
 		if writeLocation != None:
 			slashIndex = writeLocation.index('/')
 			if not os.path.isdir(writeLocation[0:slashIndex]):
@@ -111,25 +121,160 @@ class Data:
 
 		soundsPerWordCount = 0
 		for file in os.listdir(relativePATH):
-			if soundsPerWordCount > soundsPerWord:
+			if soundsPerWordCount == soundsPerWord:
 				break
 
 			f = os.path.join(relativePATH, file)
 			for i in range(noisePerSound):
-				self.addNoise(f, str(i), "noise_data/training_data/")
+				self.addNoise(f, word, str(i), "noise_data/training_data/")
 			soundsPerWordCount += 1
 		None
 
-	def convertWavToMp3(self, file):
-		sound = pydub.AudioSegment.from_wav(file)
-		file = file.replace(".wav", ".mp3")
-		tempFile = file.replace("training_data", "mp3_training_data")
-		print("*********** tempFile", tempFile)
-		file = file.replace("noise_data/training_data/", "")
-		sound.export(tempFile, format="mp3")
-		# return sound
+	# def convertWavToMp3(self, file):
+	# 	sound = pydub.AudioSegment.from_wav(file)
+	# 	file = file.replace(".wav", ".mp3")
+	# 	tempFile = file.replace("training_data", "mp3_training_data")
+	# 	print("*********** tempFile", tempFile)
+	# 	file = file.replace("noise_data/training_data/", "")
+	# 	sound.export(tempFile, format="mp3")
+	# 	# return sound
 
-	def get_Train(self):
+
+	def MoveXandYFiles(self):
+		PATH = "noise_data/training_data/"
+		if not os.path.isdir(PATH + "X"):
+			os.mkdir(PATH + "X/")
+		if not os.path.isdir(PATH + "Y"):
+			os.mkdir(PATH + "Y/")
+
+		print("Folder X and Y created")
+
+		fileList = []
+		for f in os.listdir(PATH):
+			if os.path.isfile(os.path.join(PATH, f)):
+				fileList.append(f)
+
+		for i in range(len(fileList)):
+			if i % 11 == 0:
+				try:
+					shutil.move(PATH +fileList[i+11], PATH + "Y")
+				except:
+					None
+			else:
+				try:
+					shutil.move(PATH + fileList[i], PATH + "X")
+				except:
+					None
+		print("File X and Y filled")
+		None
+
+	def createTrainingTestVerificationDataSet(self):
+		PATH_X = "noise_data/training_data/X/"
+		PATH_Y = "noise_data/training_data/Y/"
+
+		PATH_TRAINING_X = PATH_X + "training"
+		PATH_TESTING_X = PATH_X + "testing"
+		PATH_VERIFICATION_X = PATH_X + "verification"
+
+		# PATH_TRAINING_Y = PATH_Y + "training"
+		# PATH_TESTING_Y = PATH_Y + "testing"
+		# PATH_VERIFICATION_Y = PATH_Y + "verification"
+
+		# Create folders
+		if not os.path.isdir(PATH_TRAINING_X):
+			os.mkdir(PATH_TRAINING_X)
+			os.chmod(PATH_TRAINING_X, 0o777)
+
+		if not os.path.isdir(PATH_VERIFICATION_X):
+			os.mkdir(PATH_VERIFICATION_X)
+			os.chmod(PATH_VERIFICATION_X, 0o777)
+
+		if not os.path.isdir(PATH_TESTING_X):
+			os.mkdir(PATH_TESTING_X)
+			os.chmod(PATH_TESTING_X, 0o777)
+		
+		print("folders Created")
+
+		# Transfer data into three different sub folders
+		fileListX = []
+		for f in os.listdir(PATH_X):
+			if os.path.isfile(os.path.join(PATH_X, f)):
+				fileListX.append(f)
+
+		print(len(fileListX))
+
+		xTrainingSize = int(len(fileListX) * .6)
+		xTestingSize = int(len(fileListX) * .2)
+		xVerificationSize = int(len(fileListX) * .2) + 1
+
+		for i in range(xTrainingSize):
+			index = random.randrange(0, len(fileListX)-1)
+			temp = "*"
+			try:
+				temp = fileListX.pop(index)
+				shutil.move(PATH_X + temp, PATH_TRAINING_X)
+			except Exception as e:
+				print("Train i", i, "temp", temp )
+				print(e)
+
+		for i in range(xTestingSize):
+			index = random.randrange(0, len(fileListX)-1)
+			temp = "*"
+			try:
+				temp = fileListX.pop(index)
+				shutil.move(PATH_X + temp, PATH_TESTING_X)
+			except Exception as e:
+				print("Test i", i, "temp", temp)
+				print(e)
+
+		for i in range(xVerificationSize):
+			temp = "*"
+			try:
+				index = random.randrange(0, len(fileListX)-1)
+				temp = fileListX.pop(index)
+				shutil.move(PATH_X + temp, PATH_VERIFICATION_X)
+			except ValueError:
+				shutil.move(PATH_X + fileListX.pop(0), PATH_VERIFICATION_X)
+			except Exception as e:
+				print("V i", i, "temp", temp)
+				print(e)
+
+		None
+
+	def createDataListFile(self):
+		PATH_X = "noise_data/training_data/X/"
+		PATH_Y = "noise_data/training_data/Y/"
+
+		PATH_TRAINING_X = PATH_X + "training"
+		PATH_TESTING_X = PATH_X + "testing"
+		PATH_VERIFICATION_X = PATH_X + "verification"
+
+		xTrainingFileList = os.listdir(PATH_TRAINING_X)
+		xTestingFileList = os.listdir(PATH_TESTING_X)
+		xVerificationFileList = os.listdir(PATH_VERIFICATION_X)
+
+		# string = "00b01445_nohash_0_left_noise_2_.wav"
+		# print(string[0:string.index("noise")-1] + ".wav")
+
+		with open(PATH_X + "xTrainingFileList.csv", 'w', newline='') as f:
+			writer = csv.writer(f)
+			for file in xTrainingFileList:
+				yFile = file[0:file.index("noise")-1] + ".wav"
+				writer.writerow([file, yFile])
+		
+		with open(PATH_X + "xTestingFileList.csv", 'w', newline='') as f:
+			writer = csv.writer(f)
+			for file in xTestingFileList:
+				yFile = file[0:file.index("noise")-1] + ".wav"
+				writer.writerow([file, yFile])
+
+		with open(PATH_X + "xVerificationFileList.csv", 'w', newline='') as f:
+			writer = csv.writer(f)
+			for file in xVerificationFileList:
+				yFile = file[0:file.index("noise")-1] + ".wav"
+				writer.writerow([file, yFile])
+
+	def createDataSets(self):
 		# both 1D
 		# mix words
 		# 16,000 points for testing
@@ -142,28 +287,13 @@ class Data:
 		# Cut it down under 100MB
 		# np.matrix is full of .wav or .mp3 (which ever is smaller)
 
-		allDataX = np.matrix([None]*80000)
-		allDataY = np.matrix([None]*80000)
-		PATH = "noise_data/training_data/"
+		self.initilize()
+		self.MoveXandYFiles()
+		self.createTrainingTestVerificationDataSet()
+		self.createDataListFile()
 
-		fileList = os.listdir(PATH)
-		tempY = fileList[10]
-		indexCount = 0
-
-		for i in range(len(fileList)):
-			if i % 11 == 1:
-				tempY = PATH + "/" + fileList[i+10]
-			else:
-				allDataX[indexCount] = fileList[i]
-				allDataY[indexCount] = tempY
-				indexCount += 1
-			
-
-
-		# x_train = [1, 2, 3]
-		# y_train = [1, 2, 3]
-
-		return x_train, y_train
+	def get_Train(self):
+		None
 
 	def get_Test(self):
 		x_test = [1, 2, 3]
@@ -198,7 +328,6 @@ def testCreateData():
 def testInitilization():
 	# Set installBaseData to True if tensorflow data has not been installed 
 	data = Data()
-
 	noisePerSound = 10
 	soundPerWord = 1000
 	word = ["down", "go", "left", "no", "right", "stop", "up", "yes"]
@@ -226,4 +355,18 @@ def testPlotSound():
 	data.plotSound("A:/OSU/Semester 9/CS 5783/CS5783-FinalProject/src/noise_data/training_data/0a9f9af7_nohash_0_noise_9_.wav")
 	plt.show()
 
+def testCreateDataSets():
+	data = Data()
+	data.MoveXandYFiles()
+	# data.createData()
+	# dataX = np.load("trainingDataX.npy", allow_pickle=True)
+	# dataY = np.load("trainingDataY.npy", allow_pickle=True)
+	# print(dataX)
+	# print(dataY)
+	None
+
+def testCreateTrainingTestVerificationDataSet():
+	data = Data()
+	# data.createDataSets()
+	data.createDataListFile()
 
