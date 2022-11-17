@@ -323,6 +323,7 @@ class Data:
 			data_rate_Y.append(dataRate)
 
 		x_data = np.stack(x_data)
+		y_data = np.stack(y_data)
 		# y_data = np.concatenate(y_data)
 
 		return x_data, y_data, data_rate_x, data_rate_Y
@@ -397,8 +398,9 @@ def testCreateTrainingTestVerificationDataSet():
 	data = Data()
 	# data.createDataSets(5, 75, 8)
 	x_train, y_train, x_data_rate, y_data_rate = data.get_Data("testing")
-	x_
+	print(x_train.shape)
+	print(y_train.shape)
 
 	# print(x_train)
-	np.savetxt("x_train.npy", x_train)
+	# np.savetxt("x_train.npy", x_train)
 
