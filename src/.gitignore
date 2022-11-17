@@ -1,5 +1,6 @@
 data/
 .ipyn_checkpoints/
+noise_data/
 
 *.wav
 *.png
