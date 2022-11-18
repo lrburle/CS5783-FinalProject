@@ -21,7 +21,6 @@ import matplotlib.pyplot as plt
 from scipy.io import wavfile
 
 class Data:
-
 	# def __init__(self, noisePerSound=0, soundPerWord=0, word="", installBaseData=False):
 	def initilize(self, noisePerSound=10, soundPerWord=1000, numberOfWords=8):
 		# if installBaseData:
@@ -336,7 +335,13 @@ class Data:
 
 	def get_Verification(self):
 		return self.get_Data("verification")
+	
+	def convertMatrixToWav(self, M, sr):
+		if not os.path.exists('./outputs'):
+			os.mkdir('outputs')
 
+		for idx, row in enumerate(M):
+			sf.write(f'./outputs/test_wav_{idx}.wav', row, sr)
 
 def testPrepareData():
 	data = Data()
