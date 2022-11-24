@@ -10,12 +10,36 @@ from graph import Graph
 
 import numpy as np
 import time
-import os
+import sys
 from scipy.io import wavfile
 
+def cmdlParse(args):
+    directory_flag = False 
+    load_model_flag = False 
+    train_flag = False
+    model_directory = None
+
+    for i in range(len(args)):
+        if '-d' in args[i]:
+            directory_flag = True
+        if '-l' in args[i]:
+            load_model_flag = True
+            model_directory = args[i+1]
+        if '-t' in args[i]:
+            train_flag = True
+    
+    return directory_flag, load_model_flag, model_directory, train_flag
 
 if __name__ == '__main__':
-    
+    directory_flag = False 
+    load_model_flag = False 
+    train_flag = False
+    model_directory = './backup'
+
+	# Accepts command line arguments for controlling the 
+    if (len(sys.argv) > 1):
+        directory_flag, load_model_flag, model_directory, train_flag = cmdlParse(sys.argv)
+   
     dat = Data()
 
     x_train, y_train, x_data_rate, y_data_rate = dat.get_Train()  
@@ -26,18 +50,21 @@ if __name__ == '__main__':
     epochs = 25
     m = Model(x_train, y_train, x_test, y_test, x_valid, y_valid, epochs)
     model = m.model()
-    
-    #This loads the latest model iteration
-    model = m.model_load('backup/trial.12.bak')
+
+    if (load_model_flag):
+        # This loads the latest model iteration
+        model = m.model_load(model_directory)
     
     #This loads the latest checkpoint into the model.
     #model = m.checkpoint_load('backup', model)
 
-    # history, model = m.train(model)
-    # m.model_save(model)
+    if (train_flag):
+        history, model = m.train(model)
+        m.model_save(model)
     
-    output = m.predict(model, x_test)
-    dat.convertMatrixToWav(output, x_data_rate_test[0])
+    if (train_flag or load_model_flag):
+        output = m.predict(model, x_test)
+        dat.convertMatrixToWav(output, x_data_rate_test[0])
 
     # Output necessary graphs and outputs. 
     g = Graph(history)
