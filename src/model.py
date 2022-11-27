@@ -28,7 +28,6 @@ class Model:
 		out = tf.keras.Sequential([
 			keras.layers.SimpleRNN(20, return_sequences=True, input_shape=(None, 1)),
 			keras.layers.SimpleRNN(20, return_sequences=True),
-			# keras.layers.Attention(),
 
 			#Dense layer output.
 			keras.layers.Dense(30, activation='relu'),
@@ -43,24 +42,21 @@ class Model:
 
 		return out 
 	
-	def modelTransformer(self):
-		out = tf.keras.Sequential([
-			keras.layers.SimpleRNN(20, return_sequences=True, input_shape=(None, 1)),
-			keras.layers.SimpleRNN(20, return_sequences=True),
-			keras.layers.Attention(),
+	def modelTransformer(self, numHeads, keyDim, dropout, in_vector):
+		inputs = tf.keras.layers.Input((in_vector.shape[1],))
+		x = keras.layers.LayerNormalization(epsilon=0.01)(inputs)
+		x = keras.layers.MultiHeadAttention(num_heads=numHeads, key_dim=keyDim)(x)
+		x = keras.layers.Dropout(dropout)(x) 
+		outputs = x + inputs
 
-			#Dense layer output.
-			keras.layers.Dense(30, activation='relu'),
-			keras.layers.Dense(1, activation='linear')
-			])
-		
-		opt = keras.optimizers.Adam(learning_rate=0.001)
+		out = tf.keras.Model(inputs, outputs)
+  
+		opt = keras.optimizers.Adam(learning_rate=0.0001)
 
-		# out.compile(loss="mse", optimizer=opt, metrics=['sparse_categorical_accuracy'])
-		out.compile(loss="mse", optimizer=opt, metrics=['mean_squared_error', 'accuracy'])
+		out.compile(loss="mean_squared_error", optimizer=opt, metrics=['mean_squared_error', 'mean_squared_accuracy'])
 		self.model = out
 
-		return out 
+		return out
 
 	# Training our model
 	def train(self, modelIn):

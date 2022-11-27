@@ -9,7 +9,6 @@ from data import Data
 from graph import Graph 
 
 import numpy as np
-import time
 import sys
 from scipy.io import wavfile
 
@@ -49,7 +48,8 @@ if __name__ == '__main__':
     # Create, train, test, and evaluate model
     epochs = 25
     m = Model(x_train, y_train, x_test, y_test, x_valid, y_valid, epochs)
-    model = m.model()
+    # model = m.model()
+    model = m.modelTransformer(120, 17, 0.0, x_train)
 
     if (load_model_flag):
         # This loads the latest model iteration
