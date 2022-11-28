@@ -39,24 +39,57 @@ class Model:
 		# out.compile(loss="mse", optimizer=opt, metrics=['sparse_categorical_accuracy'])
 		out.compile(loss="mse", optimizer=opt, metrics=['mean_squared_error', 'accuracy'])
 		self.model = out
-
+  
 		return out 
 	
-	def modelTransformer(self, numHeads, keyDim, dropout, in_vector):
-		inputs = tf.keras.layers.Input((in_vector.shape[1],))
-		x = keras.layers.LayerNormalization(epsilon=0.01)(inputs)
-		x = keras.layers.MultiHeadAttention(num_heads=numHeads, key_dim=keyDim)(x)
-		x = keras.layers.Dropout(dropout)(x) 
-		outputs = x + inputs
+	def encoderLayer(self, inputs, numHeads, headSize, dropout, dense_neurons):
+		# MultiHead Attention layer.
+		mOut = keras.layers.MultiHeadAttention(num_heads=numHeads, key_dim=headSize)(inputs)
+		x = keras.layers.Dropout(dropout)(mOut)
 
-		out = tf.keras.Model(inputs, outputs)
+		#Normilization layer
+		add1 = input_vector + mOut
+		n1 = keras.layers.LayerNormilization(add1) 
+
+		# Feedforward network
+		d1 = keras.layers.Dense(dense_neurons, 'relu')(n1)
+		d2 = keras.layers.Dense(1, 'linear')(d1)
+
+		fout = keras.layers.Dropout(dropout)(d2)
+
+		# Add and normalize the incoming vectors.
+		add2 = n1 + fout
+		n2 = keras.layers.LayerNormilization(add1) 
+
+		return n2
+
+	def buildTransformer(self, vector_in, h_size, num_h, num_of_blocks, dense_units, dropout, dense_dropout):
+
+		inputs = keras.Input(shape=vector_in)
+
+		x = inputs
+
+		for i in range(num_of_blocks):
+			x = self.encoderLayer(inputs, num_h, h_size, dropout, dense_units)
   
-		opt = keras.optimizers.Adam(learning_rate=0.0001)
+		x = keras.layers.GlobalAveragePooling1D(data_format="channels_first")(x)
+		
+		for i in range(dense_units):
+			x = keras.layers.Dense(i, activation='relu')(x)
+			x = keras.layers.Dropout(dense_dropout)
+  
+		outputs = keras.layers.Dense(1, activation='linear')(x)
 
-		out.compile(loss="mean_squared_error", optimizer=opt, metrics=['mean_squared_error', 'mean_squared_accuracy'])
-		self.model = out
+		model = keras.Model(inputs, outputs)
 
-		return out
+		opt = keras.optimizers.Adam(learning_rate=0.001)
+		model.compile(loss="mse", optimizer=opt, metrics=['mean_squared_error', 'accuracy'])
+
+		model.summary()
+
+		self.model = model
+
+		return model
 
 	# Training our model
 	def train(self, modelIn):

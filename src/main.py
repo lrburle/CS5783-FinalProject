@@ -17,10 +17,14 @@ def cmdlParse(args):
     load_model_flag = False 
     train_flag = False
     model_directory = None
+    model_type = 'null'
 
     for i in range(len(args)):
         if '-d' in args[i]:
             directory_flag = True
+        if '-m' in args[i]:
+            directory_flag = True
+            model_type = args[i+1]
         if '-l' in args[i]:
             load_model_flag = True
             model_directory = args[i+1]
@@ -42,14 +46,17 @@ if __name__ == '__main__':
     dat = Data()
 
     x_train, y_train, x_data_rate, y_data_rate = dat.get_Train()  
-    x_test, y_test, x_data_rate_test, y_data_rate_test = dat.get_Test()  
-    x_valid, y_valid, x_data_rate_val, y_data_rate_val = dat.get_Verification()  
+    x_test, y_test, x_data_rate_test, y_data_rate_test = dat.get_Test()
+    x_valid, y_valid, x_data_rate_val, y_data_rate_val = dat.get_Verification()
 
     # Create, train, test, and evaluate model
     epochs = 25
     m = Model(x_train, y_train, x_test, y_test, x_valid, y_valid, epochs)
-    # model = m.model()
-    model = m.modelTransformer(120, 17, 0.0, x_train)
+
+    if model_type == 'tran':
+        model = m.buildTransformer(vector_in=x_train, h_size=256, num_h=4, num_of_blocks=4, dense_units=[128], dropout=0.25, dense_dropout=0.4)
+    else:
+        model = m.model()
 
     if (load_model_flag):
         # This loads the latest model iteration
