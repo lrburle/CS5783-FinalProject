@@ -12,6 +12,7 @@ import numpy as np
 import sys
 from scipy.io import wavfile
 
+# Used to control the top level from the terminal.
 def cmdlParse(args):
     directory_flag = False 
     load_model_flag = False 
@@ -31,7 +32,7 @@ def cmdlParse(args):
         if '-t' in args[i]:
             train_flag = True
     
-    return directory_flag, load_model_flag, model_directory, train_flag
+    return directory_flag, load_model_flag, model_directory, train_flag, model_type
 
 if __name__ == '__main__':
     directory_flag = False 
@@ -41,7 +42,7 @@ if __name__ == '__main__':
 
 	# Accepts command line arguments for controlling the 
     if (len(sys.argv) > 1):
-        directory_flag, load_model_flag, model_directory, train_flag = cmdlParse(sys.argv)
+        directory_flag, load_model_flag, model_directory, train_flag, model_type = cmdlParse(sys.argv)
    
     dat = Data()
 
