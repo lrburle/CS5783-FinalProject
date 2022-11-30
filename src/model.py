@@ -65,7 +65,7 @@ class Model:
 
 	def buildTransformer(self, vector_in, h_size, num_h, num_of_blocks, dense_units, dropout, dense_dropout):
 
-		inputs = keras.Input(shape=vector_in)
+		inputs = keras.Input(shape=vector_in[0].shape[0])
 
 		x = inputs
 
