@@ -3,6 +3,17 @@ Oklahoma State University, ECE
 Author(s): Landon Burleson, Madhusti Dhasaradhan, and Alex Sensintaffar
 
 This is the main code needed to import data, train/test model, and evaluate.
+
+Command line option flags:
+    -t : is used to train the model
+    -m tran : model selection. Ommitting this option will use the default RNN model. 'tran' in
+    combination with -m will select the transformer model.
+    -l : loads a selected model from the ./backup/ directory.
+
+To use the command line arguments, you may do so using the following command formats:
+    python3 main.py -t -m tran // This is used to train the transformer model.
+    python3 main.py -l ./backup/trail.4.bak -m tran // This is used to load a former model for the transformer model. This assumes the traial.4.bak directory is associated with the transformer model. 
+
 """
 from model import Model 
 from data import Data
@@ -10,21 +21,16 @@ from graph import Graph
 
 import numpy as np
 import sys
-from scipy.io import wavfile
 
 # Used to control the top level from the terminal.
 def cmdlParse(args):
-    directory_flag = False 
     load_model_flag = False 
     train_flag = False
     model_directory = None
     model_type = 'null'
 
     for i in range(len(args)):
-        if '-d' in args[i]:
-            directory_flag = True
         if '-m' in args[i]:
-            directory_flag = True
             model_type = args[i+1]
         if '-l' in args[i]:
             load_model_flag = True
@@ -32,17 +38,16 @@ def cmdlParse(args):
         if '-t' in args[i]:
             train_flag = True
     
-    return directory_flag, load_model_flag, model_directory, train_flag, model_type
+    return load_model_flag, model_directory, train_flag, model_type
 
 if __name__ == '__main__':
-    directory_flag = False 
     load_model_flag = False 
     train_flag = False
     model_directory = './backup'
 
 	# Accepts command line arguments for controlling the 
     if (len(sys.argv) > 1):
-        directory_flag, load_model_flag, model_directory, train_flag, model_type = cmdlParse(sys.argv)
+        load_model_flag, model_directory, train_flag, model_type = cmdlParse(sys.argv)
    
     dat = Data()
 
