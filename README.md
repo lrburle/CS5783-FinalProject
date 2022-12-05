@@ -1,5 +1,7 @@
 # CS5783-FinalProject - Final project for Fall 2022 CS5783 at OSU
 
+This project showcases the use of RNN and transformer based models to de-noise audio input samples.
+
 ## Library requirements
 In order to effectively execute the code, the library 'librosa' must be installed for the audio manipulation functions needed to create the 
 test, train, and validation training sets for use in the model. This library can be installed with the following command:
