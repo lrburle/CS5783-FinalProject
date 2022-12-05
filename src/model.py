@@ -56,20 +56,20 @@ class Model:
 
         # Feedforward network
         d1 = keras.layers.Dense(dense_neurons, 'relu')(n1)
-        d2 = keras.layers.Dense(1, 'linear')(d1)
+        d2 = keras.layers.Dense(1)(d1) #Not specifiying the type of activation function defaults to a linear function.
 
         fout = keras.layers.Dropout(dropout)(d2)
 
         # Add and normalize the incoming vectors.
         add2 = add1 + fout 
 
-        # n2 = keras.layers.LayerNormilization(add1) 
+        n2 = keras.layers.LayerNormalization(epsilon=1e-6)(add2) 
 
-        return n2
+        return n2 
 
     def buildTransformer(self, vector_in, h_size, num_h, num_of_blocks, dense_units, dropout, dense_dropout):
-
-        inputs = keras.Input(shape=(None, vector_in[0].shape[0], 1))
+        input_shape = [vector_in.shape[1], 1]
+        inputs = keras.Input(shape=input_shape)
 
         x = inputs
 
@@ -80,9 +80,9 @@ class Model:
         
         for i in range(dense_units):
             x = keras.layers.Dense(i, activation='relu')(x)
-            x = keras.layers.Dropout(dense_dropout)
+            x = keras.layers.Dropout(dense_dropout)(x)
   
-        outputs = keras.layers.Dense(1, activation='linear')(x)
+        outputs = keras.layers.Dense(1)(x)
 
         model = keras.Model(inputs, outputs)
 

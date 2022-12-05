@@ -60,7 +60,7 @@ if __name__ == '__main__':
     m = Model(x_train, y_train, x_test, y_test, x_valid, y_valid, epochs)
 
     if model_type == 'tran':
-        model = m.buildTransformer(vector_in=x_train, h_size=256, num_h=4, num_of_blocks=4, dense_units=[128], dropout=0.25, dense_dropout=0.4)
+        model = m.buildTransformer(vector_in=x_train, h_size=256, num_h=4, num_of_blocks=4, dense_units=128, dropout=0.25, dense_dropout=0.4)
     else:
         model = m.model()
 
