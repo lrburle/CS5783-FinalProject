@@ -60,7 +60,7 @@ if __name__ == '__main__':
     m = Model(x_train, y_train, x_test, y_test, x_valid, y_valid, epochs)
 
     if model_type == 'tran':
-        model = m.buildTransformer(vector_in=x_train, h_size=256, num_h=4, num_of_blocks=4, dense_units=128, dropout=0.25, dense_dropout=0.4)
+        model = m.buildTransformer(vector_in=x_train, h_size=256, num_h=4, num_of_blocks=4, dense_units=[128], dropout=0.25, dense_dropout=0.4)
     else:
         model_type = 'rnn'
         model = m.model()
@@ -68,19 +68,23 @@ if __name__ == '__main__':
     if (load_model_flag):
         # This loads the latest model iteration
         model = m.model_load(model_directory)
+        history = model.evaluate(x_test, y_test)
+        print(history['mean_squared_error'])
+        print(history['accuracy'])
     
     #This loads the latest checkpoint into the model.
     #model = m.checkpoint_load('backup', model)
 
+    # Trains the chosen model if the -t flat is set upon execution of the main.py script.
     if (train_flag):
         history, model = m.train(model)
         m.model_save(model, model_type)
+
+        # Output necessary graphs and outputs. 
+        g = Graph(history)
+        g.mseEpochs(model_type)
+        g.lossEpochs(model_type)
     
     if (train_flag or load_model_flag):
         output = m.predict(model, x_test)
         dat.convertMatrixToWav(output, x_data_rate_test[0])
-
-    # Output necessary graphs and outputs. 
-    g = Graph(history)
-    g.mseEpochs()
-    g.lossEpochs()

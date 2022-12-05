@@ -18,8 +18,6 @@ import tensorflow as tf
 import soundfile as sf
 import matplotlib.pyplot as plt
 
-from scipy.io import wavfile
-
 class Data:
 	# def __init__(self, noisePerSound=0, soundPerWord=0, word="", installBaseData=False):
 	def initilize(self, noisePerSound=10, soundPerWord=1000, numberOfWords=8):
@@ -328,13 +326,26 @@ class Data:
 		return x_data, y_data, data_rate_x, data_rate_Y
 
 	def get_Train(self):
-		return self.get_Data("training")
+		x_data, y_data, data_rate_x, data_rate_Y = self.get_Data("training")
+		x_data = x_data.reshape(x_data.shape[0], x_data.shape[1], 1)
+		y_data = y_data.reshape(y_data.shape[0], y_data.shape[1], 1)
+		return x_data, y_data, data_rate_x, data_rate_Y
 
 	def get_Test(self):
-		return self.get_Data("testing")
+		x_data, y_data, data_rate_x, data_rate_Y = self.get_Data("testing")
+
+		x_data = x_data.reshape(x_data.shape[0], x_data.shape[1], 1)
+		y_data = y_data.reshape(y_data.shape[0], y_data.shape[1], 1)
+
+		return x_data, y_data, data_rate_x, data_rate_Y
 
 	def get_Verification(self):
-		return self.get_Data("verification")
+		x_data, y_data, data_rate_x, data_rate_Y = self.get_Data("verification")
+
+		x_data = x_data.reshape(x_data.shape[0], x_data.shape[1], 1)
+		y_data = y_data.reshape(y_data.shape[0], y_data.shape[1], 1)
+
+		return x_data, y_data, data_rate_x, data_rate_Y
 	
 	def convertMatrixToWav(self, M, sr):
 		if not os.path.exists('./outputs'):

@@ -27,19 +27,25 @@ class Model:
     def model(self):
         out = tf.keras.Sequential([
             keras.layers.SimpleRNN(64, return_sequences=True, input_shape=(22050, 1)),
-            keras.layers.SimpleRNN(64, return_sequences=True),
             keras.layers.Dropout(0.4),
 
             #Dense layer output.
             keras.layers.Dense(128, activation='relu'),
+            keras.layers.Dense(256, activation='relu'),
+            keras.layers.Dense(128, activation='relu'),
+            keras.layers.Dropout(0.4),
+            keras.layers.Dense(64, activation='relu'),
+            keras.layers.Dense(32, activation='relu'),
             keras.layers.Dropout(0.4),
             keras.layers.Dense(1)
-            ])
+        ])
         
         opt = keras.optimizers.Adam(learning_rate=0.001)
 
         # out.compile(loss="mse", optimizer=opt, metrics=['sparse_categorical_accuracy'])
         out.compile(loss="mse", optimizer=opt, metrics=['mean_squared_error', 'accuracy'])
+        out.summary()
+
         self.model = out
   
         return out 
@@ -47,25 +53,22 @@ class Model:
     def encoderLayer(self, inputs, numHeads, headSize, dropout, dense_neurons):
         # MultiHead Attention layer.
         x = keras.layers.LayerNormalization(epsilon=1e-6)(inputs)
-        mOut = keras.layers.MultiHeadAttention(num_heads=numHeads, key_dim=headSize, dropout=dropout)(x, x)
-        x = keras.layers.Dropout(dropout)(mOut)
+        att = keras.layers.MultiHeadAttention(num_heads=numHeads, key_dim=headSize, dropout=dropout)(x, x)
+        do1 = keras.layers.Dropout(dropout)(att)
 
         #Normilization layer
-        add1 = x + inputs
-        n1 = keras.layers.LayerNormalization(epsilon=1e-6)(add1) 
+        add1 = do1 + inputs
 
         # Feedforward network
-        d1 = keras.layers.Dense(dense_neurons, 'relu')(n1)
-        d2 = keras.layers.Dense(1)(d1) #Not specifiying the type of activation function defaults to a linear function.
+        n1 = keras.layers.LayerNormalization(epsilon=1e-6)(add1) 
+        x = keras.layers.Conv1D(filters=32, kernel_size=1, activation="relu")(n1)
+        # d1 = keras.layers.Dense(dense_neurons, 'relu')(n1)
+        # d2 = keras.layers.Dense(1)(d1) #Not specifiying the type of activation function defaults to a linear function.
+        do2 = keras.layers.Dropout(dropout)(x)
+        x = keras.layers.Conv1D(filters=inputs.shape[-1], kernel_size=1)(do2)
+        add2 = x + add1 
 
-        fout = keras.layers.Dropout(dropout)(d2)
-
-        # Add and normalize the incoming vectors.
-        add2 = add1 + fout 
-
-        n2 = keras.layers.LayerNormalization(epsilon=1e-6)(add2) 
-
-        return n2 
+        return add2 
 
     def buildTransformer(self, vector_in, h_size, num_h, num_of_blocks, dense_units, dropout, dense_dropout):
         input_shape = [vector_in.shape[1], 1]
@@ -78,7 +81,7 @@ class Model:
   
         x = keras.layers.GlobalAveragePooling1D(data_format="channels_first")(x)
         
-        for i in range(dense_units):
+        for i in dense_units:
             x = keras.layers.Dense(i, activation='relu')(x)
             x = keras.layers.Dropout(dense_dropout)(x)
   
@@ -86,7 +89,7 @@ class Model:
 
         model = keras.Model(inputs, outputs)
 
-        opt = keras.optimizers.Adam(learning_rate=0.001)
+        opt = keras.optimizers.Adam(learning_rate=0.00005)
         model.compile(loss="mse", optimizer=opt, metrics=['mean_squared_error', 'accuracy'])
 
         model.summary()
@@ -106,13 +109,13 @@ class Model:
 
         cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, monitor='mean_squared_error', mode=min, save_weights_only=True)
   
-        history = modelIn.fit(self.x_train, self.y_train, epochs=self.epochs, callbacks=[cp_callback], validation_data=(self.x_valid, self.y_valid))
+        history = modelIn.fit(self.x_train, self.y_train, epochs=self.epochs, callbacks=[cp_callback], validation_data=(self.x_valid, self.y_valid), batch_size=16)
 
         return history, modelIn
 
     #Saving progress on the model to come back to previous iterations. 
     def model_save(self, modelIn, name):
-        path = './backup/{name}.trial.1.bak'
+        path = f'./backup/{name}.trial.1.bak'
         while(os.path.exists(path)):
             incr = path.split(".")[-2]
             next_incr = int(incr) + 1
