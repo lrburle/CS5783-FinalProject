@@ -111,8 +111,8 @@ class Model:
         return history, modelIn
 
     #Saving progress on the model to come back to previous iterations. 
-    def model_save(self, modelIn):
-        path = './backup/trial.1.bak'
+    def model_save(self, modelIn, name):
+        path = './backup/{name}.trial.1.bak'
         while(os.path.exists(path)):
             incr = path.split(".")[-2]
             next_incr = int(incr) + 1

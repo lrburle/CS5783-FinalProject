@@ -62,6 +62,7 @@ if __name__ == '__main__':
     if model_type == 'tran':
         model = m.buildTransformer(vector_in=x_train, h_size=256, num_h=4, num_of_blocks=4, dense_units=128, dropout=0.25, dense_dropout=0.4)
     else:
+        model_type = 'rnn'
         model = m.model()
 
     if (load_model_flag):
@@ -73,7 +74,7 @@ if __name__ == '__main__':
 
     if (train_flag):
         history, model = m.train(model)
-        m.model_save(model)
+        m.model_save(model, model_type)
     
     if (train_flag or load_model_flag):
         output = m.predict(model, x_test)
