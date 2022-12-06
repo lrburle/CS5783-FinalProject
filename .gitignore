@@ -2,7 +2,9 @@
 src\AddNoiseToData.py
 src\CreateData.py
 
+*__pycache__
 *.txt
 *.zip
 *.wav
 *.mp3
+*.DS_Store

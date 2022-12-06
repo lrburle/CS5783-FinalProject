@@ -47,14 +47,6 @@ class Data:
 				extract=True,
 				cache_dir='.', cache_subdir='data')
 	
-		# self.createFileList("data/mini_speech_commands/down/", "data/FileListDown.txt")
-		# self.createFileList("data/mini_speech_commands/go/", "data/FileListGo.txt")
-		# self.createFileList("data/mini_speech_commands/left/", "data/FileListLeft.txt")
-		# self.createFileList("data/mini_speech_commands/no/", "data/FileListNo.txt")
-		# self.createFileList("data/mini_speech_commands/right/", "data/FileListRight.txt")
-		# self.createFileList("data/mini_speech_commands/stop/", "data/FileListStop.txt")
-		# self.createFileList("data/mini_speech_commands/up/", "data/FileListUp.txt")
-		# self.createFileList("data/mini_speech_commands/yes/", "data/FileListYes.txt")
 		None
 
 	def addNoise(self, file, word, fileIdentifier="", writeLocation=None):
@@ -104,10 +96,6 @@ class Data:
 		sf.write(noiseFile, signal_noise, sr)
 
 	def createData(self, noisePerSound, soundsPerWord, word):
-		# TODO inter mixing word?
-		# TODO how many noisy versions of the same sound
-		# TODO how many sounds from same word
-
 		relativePATH = "data/mini_speech_commands/" + word + "/"
 
 		soundsPerWordCount = 0
@@ -120,16 +108,6 @@ class Data:
 				self.addNoise(f, word, str(i), "noise_data/training_data/")
 			soundsPerWordCount += 1
 		None
-
-	# def convertWavToMp3(self, file):
-	# 	sound = pydub.AudioSegment.from_wav(file)
-	# 	file = file.replace(".wav", ".mp3")
-	# 	tempFile = file.replace("training_data", "mp3_training_data")
-	# 	print("*********** tempFile", tempFile)
-	# 	file = file.replace("noise_data/training_data/", "")
-	# 	sound.export(tempFile, format="mp3")
-	# 	# return sound
-
 
 	def MoveXandYFiles(self, numOfX):
 		PATH = "noise_data/training_data/"
@@ -363,70 +341,3 @@ class Data:
 
 		for idx, row in enumerate(M):
 			sf.write(f'./outputs/test_wav_{idx}.wav', row, sr)
-
-def testPrepareData():
-	data = Data()
-	data.prepareData()
-
-def testAddNoise():
-	data = Data()
-
-	file = "test_down.wav"
-	data.addNoise(file)
-
-def testCreateData():
-	data = Data()
-
-	data.createData(noisePerSound=10, soundPerWord=10, word="down")
-
-# Example for creating testing and training data with noise
-def testInitilization():
-	# Set installBaseData to True if tensorflow data has not been installed 
-	data = Data()
-	noisePerSound = 10
-	soundPerWord = 1000
-	word = ["down", "go", "left", "no", "right", "stop", "up", "yes"]
-
-	for i in word:
-		data.createData(noisePerSound=noisePerSound, soundsPerWord=soundPerWord, word=i)
-	
-def testConvertWavToMp3():
-	data = Data()
-
-	# for file in os.listdir("noise_data/training_data"):
-	fileList = os.listdir("noise_data/training_data")
-
-	# for i in range(len(fileList)):
-	for i in range(2):
-		temp = "noise_data/training_data/" + fileList[i]
-		print("temp", temp)
-		data.convertWavToMp3(temp)
-
-def testPlotSound():
-	data = Data()
-	plt.figure("Sound")
-	data.plotSound("A:/OSU/Semester 9/CS 5783/CS5783-FinalProject/src/noise_data/training_data/0a9f9af7_nohash_0.wav")
-	plt.figure("Noise Sound")
-	data.plotSound("A:/OSU/Semester 9/CS 5783/CS5783-FinalProject/src/noise_data/training_data/0a9f9af7_nohash_0_noise_9_.wav")
-	plt.show()
-
-def testCreateDataSets():
-	data = Data()
-	data.MoveXandYFiles()
-	# data.createData()
-	# dataX = np.load("trainingDataX.npy", allow_pickle=True)
-	# dataY = np.load("trainingDataY.npy", allow_pickle=True)
-	# print(dataX)
-	# print(dataY)
-	None
-
-def testCreateTrainingTestVerificationDataSet():
-	data = Data()
-	# data.createDataSets(5, 75, 8)
-	x_train, y_train, x_data_rate, y_data_rate = data.get_Data("testing")
-	print(x_train.shape)
-	print(y_train.shape)
-
-	# print(x_train)
-	# np.savetxt("x_train.npy", x_train)
-
