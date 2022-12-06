@@ -26,7 +26,7 @@ class Model:
     # Defining our model.
     def model(self):
         out = tf.keras.Sequential([
-            keras.layers.SimpleRNN(64, return_sequences=True, input_shape=(22050, 1)),
+            keras.layers.SimpleRNN(64, return_sequences=True, input_shape=(4096, 1)),
             keras.layers.Dropout(0.4),
 
             #Dense layer output.

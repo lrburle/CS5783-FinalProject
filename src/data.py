@@ -329,6 +329,10 @@ class Data:
 		x_data, y_data, data_rate_x, data_rate_Y = self.get_Data("training")
 		x_data = x_data.reshape(x_data.shape[0], x_data.shape[1], 1)
 		y_data = y_data.reshape(y_data.shape[0], y_data.shape[1], 1)
+
+		x_data = x_data[:, :4096, :]
+		y_data = y_data[:, :4096, :]
+  
 		return x_data, y_data, data_rate_x, data_rate_Y
 
 	def get_Test(self):
@@ -337,6 +341,9 @@ class Data:
 		x_data = x_data.reshape(x_data.shape[0], x_data.shape[1], 1)
 		y_data = y_data.reshape(y_data.shape[0], y_data.shape[1], 1)
 
+		x_data = x_data[:, :4096, :]
+		y_data = y_data[:, :4096, :]
+
 		return x_data, y_data, data_rate_x, data_rate_Y
 
 	def get_Verification(self):
@@ -344,6 +351,9 @@ class Data:
 
 		x_data = x_data.reshape(x_data.shape[0], x_data.shape[1], 1)
 		y_data = y_data.reshape(y_data.shape[0], y_data.shape[1], 1)
+		
+		x_data = x_data[:, :4096, :]
+		y_data = y_data[:, :4096, :]
 
 		return x_data, y_data, data_rate_x, data_rate_Y
 	

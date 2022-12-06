@@ -11,7 +11,7 @@
 			"program": "${file}",
 			"console": "integratedTerminal",
 			"justMyCode": true,
-			"args": ["-l", "backup/rnn.trial.1.bak/"]
+			"args": ["-t", "-m", "tran"]
 		}
 	]
 }
