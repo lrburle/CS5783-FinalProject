@@ -9,8 +9,14 @@ test, train, and validation training sets for use in the model. This library can
 pip3 install librosa
 ```
 
-Other libraries used: numpy, tensorflow, shutil, soundfile, matplotlib, os, csv, and random. These libraries can be installed utilizing the same command structure as above. 
-
+Other libraries used: numpy, tensorflow, shutil, soundfile, matplotlib, os, csv, and random. These libraries can be installed utilizing the same command structure as shown below. 
+```bash
+pip3 install numpy
+pip3 install tensorflow
+pip3 install shutil
+pip3 install soundfile
+pip3 install matplotlib
+```
 ## Running the python scripts from the __src__ directory
 
 Traininng the RNN-based model:
