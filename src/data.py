@@ -303,41 +303,41 @@ class Data:
 
 		return x_data, y_data, data_rate_x, data_rate_Y
 
-	def get_Train(self):
+	def get_Train(self, sequence_length):
 		x_data, y_data, data_rate_x, data_rate_Y = self.get_Data("training")
 		x_data = x_data.reshape(x_data.shape[0], x_data.shape[1], 1)
 		y_data = y_data.reshape(y_data.shape[0], y_data.shape[1], 1)
 
-		x_data = x_data[:, :4096, :]
-		y_data = y_data[:, :4096, :]
+		x_data = x_data[:, :sequence_length, :]
+		y_data = y_data[:, :sequence_length, :]
   
 		return x_data, y_data, data_rate_x, data_rate_Y
 
-	def get_Test(self):
+	def get_Test(self, sequence_length):
 		x_data, y_data, data_rate_x, data_rate_Y = self.get_Data("testing")
 
 		x_data = x_data.reshape(x_data.shape[0], x_data.shape[1], 1)
 		y_data = y_data.reshape(y_data.shape[0], y_data.shape[1], 1)
 
-		x_data = x_data[:, :4096, :]
-		y_data = y_data[:, :4096, :]
+		x_data = x_data[:, :sequence_length, :]
+		y_data = y_data[:, :sequence_length, :]
 
 		return x_data, y_data, data_rate_x, data_rate_Y
 
-	def get_Verification(self):
+	def get_Verification(self, sequence_length):
 		x_data, y_data, data_rate_x, data_rate_Y = self.get_Data("verification")
 
 		x_data = x_data.reshape(x_data.shape[0], x_data.shape[1], 1)
 		y_data = y_data.reshape(y_data.shape[0], y_data.shape[1], 1)
 		
-		x_data = x_data[:, :4096, :]
-		y_data = y_data[:, :4096, :]
+		x_data = x_data[:, :sequence_length, :]
+		y_data = y_data[:, :sequence_length, :]
 
 		return x_data, y_data, data_rate_x, data_rate_Y
 	
-	def convertMatrixToWav(self, M, sr):
+	def convertMatrixToWav(self, M, sr, model_name, data_type):
 		if not os.path.exists('./outputs'):
 			os.mkdir('outputs')
 
 		for idx, row in enumerate(M):
-			sf.write(f'./outputs/test_wav_{idx}.wav', row, sr)
+			sf.write(f'./outputs/{model_name}_{data_type}_wav_{idx}.wav', row, sr)

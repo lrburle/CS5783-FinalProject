@@ -11,20 +11,13 @@ class Graph:
     def __init__(self, history):
         self.history = history
     
-    def lossEpochs(self, model_name):
+    def mseEpochs(self, model_name, test):
         plt.figure(figsize=[12, 9])
-        plt.title("Loss vs Epochs")
-        plt.xlabel("Epochs")
-        plt.ylabel("Loss")
-        plt.plot(self.history.history['mean_squared_error'])
-        plt.grid()
-        plt.savefig(f'{model_name}_lossvsepochs.png')
+        plt.title(f'MSE vs Epochs - ({model_name.upper()}) - Test Accuracy - {test[1]}', fontsize=18)
+        plt.xlabel("Epochs", fontsize=15)
+        plt.ylabel("MSE", fontsize=15)
 
-    def mseEpochs(self, model_name):
-        plt.figure(figsize=[12, 9])
-        plt.title("MSE vs Epochs")
-        plt.xlabel("Epochs")
-        plt.ylabel("MSE")
-        plt.plot(self.history.history['mean_squared_error'])
+        plt.plot(self.history.history['mean_squared_error'], 'b', label='Mean Squared Error')
+
         plt.grid()
         plt.savefig(f'{model_name}_msevsepochs.png')

@@ -23,10 +23,10 @@ class Model:
         self.y_valid = y_valid
         self.epochs = epochs
 
-    # Defining our model.
-    def model(self):
+    # Defining our RNN model.
+    def rnn_model(self):
         out = tf.keras.Sequential([
-            keras.layers.SimpleRNN(64, return_sequences=True, input_shape=(4096, 1)),
+            keras.layers.SimpleRNN(64, return_sequences=True, input_shape=(self.x_train.shape[1], 1)),
             keras.layers.Dropout(0.4),
 
             #Dense layer output.
@@ -50,41 +50,39 @@ class Model:
   
         return out 
     
-    def encoderLayer(self, inputs, numHeads, headSize, dropout, dense_neurons):
+    def encoderLayer(self, inputs, numHeads, dropout, units):
         # MultiHead Attention layer.
-        x = keras.layers.LayerNormalization(epsilon=1e-6)(inputs)
-        att = keras.layers.MultiHeadAttention(num_heads=numHeads, key_dim=headSize, dropout=dropout)(x, x)
-        do1 = keras.layers.Dropout(dropout)(att)
+        att = keras.layers.MultiHeadAttention(num_heads=numHeads, key_dim=self.x_train[2])(inputs)
 
-        #Normilization layer
-        add1 = do1 + inputs
+        do1 = keras.layers.Dropout(dropout=dropout)(att)
+        x = keras.layers.LayerNormalization(epsilon=1e-6)(inputs + do1)
 
         # Feedforward network
-        n1 = keras.layers.LayerNormalization(epsilon=1e-6)(add1) 
-        x = keras.layers.Conv1D(filters=32, kernel_size=1, activation="relu")(n1)
-        # d1 = keras.layers.Dense(dense_neurons, 'relu')(n1)
-        # d2 = keras.layers.Dense(1)(d1) #Not specifiying the type of activation function defaults to a linear function.
-        do2 = keras.layers.Dropout(dropout)(x)
-        x = keras.layers.Conv1D(filters=inputs.shape[-1], kernel_size=1)(do2)
-        add2 = x + add1 
+        d = keras.layers.Dense(units=units, activation='relu')(x)
+        d = keras.layers.Dense(units=1)(d) #Not specifiying the type of activation function defaults to a linear function.
+        d = keras.layers.Dropout(dropout=dropout)(d)
 
-        return add2 
+        output = keras.layers.LayerNormalization(epsilon=1e-6)(x + d) 
 
-    def buildTransformer(self, vector_in, h_size, num_h, num_of_blocks, dense_units, dropout, dense_dropout):
-        input_shape = [vector_in.shape[1], 1]
-        inputs = keras.Input(shape=input_shape)
+        return output 
+
+    def transformer_model(self, h_size, num_h, num_of_blocks, dense_units, dropout, dense_dropout):
+        # input_shape = [self.x_train.shape[1], 1] #Number of samples, Number of features.
+        # inputs = keras.Input(shape=input_shape)
+
+        inputs = tf.keras.Input(shape=(None, self.x_train.shape[1]), name='inputs')
 
         x = inputs
 
+        x = keras.layers.Dense(self.x_train.shape[2], use_bias=True, activation='linear')(x)
+
+        x *= tf.math.sqrt(tf.cast(self.x_train.shape[2], tf.float32))
+        x = keras.layers.PositionEmbedding(self.x_train[1], self.x_train[2])(x)
+        x = keras.layers.Dropout(dropout=dropout)(x)
+  
         for i in range(num_of_blocks):
-            x = self.encoderLayer(inputs, num_h, h_size, dropout, dense_units)
-  
-        x = keras.layers.GlobalAveragePooling1D(data_format="channels_first")(x)
-        
-        for i in dense_units:
-            x = keras.layers.Dense(i, activation='relu')(x)
-            x = keras.layers.Dropout(dense_dropout)(x)
-  
+            x = self.encoderLayer(inputs=x, num_heads=num_h, headSize=h_size, dropout=dropout, units=dense_units)
+
         outputs = keras.layers.Dense(1)(x)
 
         model = keras.Model(inputs, outputs)
