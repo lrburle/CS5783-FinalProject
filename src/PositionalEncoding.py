@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 
+# This class was taken from the following repo in an attempt to get the transformer to work appropriately: https://github.com/cdezapasquale/transfomer-audio-classification
 class PositionalEncoding(tf.keras.layers.Layer):
 
   def __init__(self, position, d_model):
