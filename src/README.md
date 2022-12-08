@@ -33,6 +33,7 @@ Loading a previous model for the transformer based model:
 ```bash
 python3 main.py -l ./backup/tran.trial.1.bak -m tran
 ```
+__Note, due to time constraints, the transformer based model is present in the model.py code but it is not functional. The command line flags are functional and do work as intended but the model does not function appropriately.__
 
 ## Contributors
     1. Landon Burleson, Oklahoma State University ECE Department
