@@ -51,6 +51,7 @@ class Model:
         return out 
     
     def encoderLayer(self, inputs, numHeads, dropout, units):
+        # Portions of this function were derived from here: https://github.com/cdezapasquale/transfomer-audio-classification
         # MultiHead Attention layer.
         att = keras.layers.MultiHeadAttention(num_heads=numHeads, key_dim=self.x_train[2])(inputs)
 
@@ -67,6 +68,9 @@ class Model:
         return output 
 
     def transformer_model(self, h_size, num_h, num_of_blocks, dense_units, dropout, dense_dropout):
+        # Portions of this function were derived from here:
+        # https://github.com/cdezapasquale/transfomer-audio-classification
+
         # input_shape = [self.x_train.shape[1], 1] #Number of samples, Number of features.
         # inputs = keras.Input(shape=input_shape)
 
