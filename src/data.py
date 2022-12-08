@@ -341,3 +341,25 @@ class Data:
 
 		for idx, row in enumerate(M):
 			sf.write(f'./outputs/{model_name}_{data_type}_wav_{idx}.wav', row, sr)
+
+	def plotOutputSounds(self):
+		fileLocation = "C:/Users/alexs/Downloads/"
+		actural, sr0, = librosa.load(fileLocation + "rnn_actual_wav_0.wav")
+		inputs, sr1 = librosa.load(fileLocation + "rnn_inputs_wav_0.wav")
+		predicted, sr2 = librosa.load(fileLocation + "rnn_predicted_wav_0.wav")
+
+		plt.figure("Actural")
+		plt.plot(actural)
+
+		plt.figure("Input")
+		plt.plot(inputs)
+
+		plt.figure("predicted")
+		plt.plot(predicted)
+
+		plt.show()
+
+
+
+
+
