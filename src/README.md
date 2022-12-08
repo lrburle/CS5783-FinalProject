@@ -33,6 +33,8 @@ Loading a previous model for the transformer based model:
 ```bash
 python3 main.py -l ./backup/tran.trial.1.bak -m tran
 ```
+When using the __-l__ flag, the code will build the test and validation data sets for use in evaluation and predicting the test input data. You will find the updated actual, predicted, and input audio tracks in the __outputs__ subdirectory here. Loading the model will not produce a new graph as the history variable is not saved after every training session. 
+
 __Note, due to time constraints, the transformer based model is present in the model.py code but it is not functional. The command line flags are functional and do work as intended but the model does not function appropriately.__
 
 ## Contributors
