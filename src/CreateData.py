@@ -13,6 +13,9 @@ from tensorflow.python.keras import models
 
 from IPython import display
 
+
+# Tempory test files used to create the data
+# Not used in final Implementation
 def squeeze(audio, labels):
     audio = tf.squeeze(audio, axis=-1)
     return audio, labels

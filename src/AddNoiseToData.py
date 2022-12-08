@@ -11,6 +11,9 @@ from tensorflow.python.keras import layers
 from tensorflow.python.keras import models
 # from CreateData import *
 
+
+# Tempory test files used to create the data
+# Not used in final Implementation
 def get_spectrogram(waveform):
     # Convert the waveform to a spectrogram via a STFT.
     spectrogram = tf.signal.stft(

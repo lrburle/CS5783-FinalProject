@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
+
+# Tempory test files used to create the data
+# Not used in final Implementation
+
 def createFileList(path, outFile):
     dir_list = os.listdir(path)
 
