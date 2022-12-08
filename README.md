@@ -36,3 +36,5 @@ Loading a previous model for the transformer based model:
 python3 main.py -l ./backup/tran.trial.1.bak -m tran
 ```
 The output test data is stored in the __outputs__ subdirectory inside of the __src__ directory. The input audio track is denoted *inputs*, predicted values are denoted *predicted*, and the clean audio track is denoted as *actual*. The output MSE vs Epochs graph is stored inside of the __src__ directory and named __rnn_msevsepochs.png__ for easy viewing.
+
+__Note, due to time constraints, the transformer based model is present in the model.py code but it is not functional. The command line flags are functional and do work as intended but the model does not function appropriately.__
